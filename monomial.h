@@ -143,11 +143,11 @@ public:
         return !(lhs == rhs);
     }
 
-    T GetCoefficient() {
+    T GetCoefficient() const {
         return coefficient_;
     }
 
-    Powers_t GetPowers() {
+    Powers_t GetPowers() const {
         return powers_;
     }
 
