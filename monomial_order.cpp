@@ -4,11 +4,9 @@
 namespace groebner {
 namespace Lex {
 int cmp(const Monomial& lhs, const Monomial& rhs) {
-    const auto lhs_powers = lhs.GetPowers();
-    auto it = lhs_powers.cbegin();
-    const auto rhs_powers = rhs.GetPowers();
-    auto jt = rhs_powers.cbegin();
-    while (it != lhs_powers.cend() && jt != rhs_powers.cend()) {
+    auto it = lhs.GetPowers().cbegin();
+    auto jt = rhs.GetPowers().cbegin();
+    while (it != lhs.GetPowers().cend() && jt != rhs.GetPowers().cend()) {
         if (it->first != jt->first) {
             return (it->first > jt->first) - (it->first < jt->first);
         }
@@ -18,7 +16,7 @@ int cmp(const Monomial& lhs, const Monomial& rhs) {
         ++it;
         ++jt;
     }
-    return (jt == lhs_powers.cend()) - (it == rhs_powers.cend());
+    return (jt == lhs.GetPowers().cend()) - (it == rhs.GetPowers().cend());
 }
 
 bool less::operator()(const Monomial& lhs, const Monomial& rhs) const {
