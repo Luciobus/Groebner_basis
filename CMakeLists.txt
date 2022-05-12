@@ -10,6 +10,6 @@ include_directories(${Boost_INCLUDE_DIR})
 
 
 add_executable(Groebner_basis
-        main.cpp)
+        main.cpp monomial.cpp monomial_order.cpp)
 
 target_link_libraries(Groebner_basis LINK_PUBLIC ${Boost_LIBRARIES})
