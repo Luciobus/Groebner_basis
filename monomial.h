@@ -16,6 +16,8 @@ public:
 
     Monomial(std::initializer_list<std::pair<const Index_t, Degree_t>> powers);
 
+//    Monomial(const Powers_t& powers);
+
     Monomial(const Monomial& other);
 
     Monomial(Monomial&& other) noexcept;

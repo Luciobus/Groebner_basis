@@ -8,7 +8,7 @@ int cmp(const Monomial& lhs, const Monomial& rhs) {
     auto jt = rhs.GetPowers().cbegin();
     while (it != lhs.GetPowers().cend() && jt != rhs.GetPowers().cend()) {
         if (it->first != jt->first) {
-            return (it->first > jt->first) - (it->first < jt->first);
+            return (it->first < jt->first) - (it->first > jt->first);
         }
         if (it->second != jt->second) {
             return (it->second > jt->second) - (it->second < jt->second);

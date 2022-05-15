@@ -6,6 +6,8 @@
 #include "monomial.h"
 #include "monomial_order.h"
 #include "polynomial.h"
+#include "polynomial_order.h"
+#include "algorithms.h"
 
 int main() {
     namespace gr = groebner;
@@ -17,8 +19,6 @@ int main() {
                                  {10, 0}});
         auto mon2 = mon;
         assert(mon == mon2);
-//        assert(mon * Monomial<boost::rational<int>>(2) == mon2 + mon2);
-//        assert(mon - mon == Monomial<boost::rational<int>>(0));
         assert(mon * mon == gr::Monomial({{0, 2},
                                           {2, 4},
                                           {3, 6}}));
@@ -64,43 +64,69 @@ int main() {
         }
     }
     {   // Test polynomial
-        gr::Polynomial<int> pol({{gr::Monomial({{33, 2},
-                                                {10, 100}}), 16},
-                                 {gr::Monomial({{1, 2},
-                                                {2, 100}}),  10}});
-        gr::Polynomial<int> pol1({{gr::Monomial({{33, 2},
-                                                 {10, 100}}), 16},
-                                  {gr::Monomial({{1, 2},
-                                                 {2, 100}}),  10}});
-        gr::Polynomial<int> poly({{gr::Monomial({{100, 1},
-                                                 {10,  100}}), 8},
-                                  {gr::Monomial({{1, 2},
-                                                 {2, 100}}),   -10}});
+        gr::Polynomial<boost::rational<int>> pol({{gr::Monomial({{33, 2},
+                                                                 {10, 100}}), 16},
+                                                  {gr::Monomial({{1, 2},
+                                                                 {2, 100}}),  10}});
+        gr::Polynomial<boost::rational<int>> pol1({{gr::Monomial({{33, 2},
+                                                                  {10, 100}}), 16},
+                                                   {gr::Monomial({{1, 2},
+                                                                  {2, 100}}),  10}});
+        gr::Polynomial<boost::rational<int>> poly({{gr::Monomial({{100, 1},
+                                                                  {10,  100}}), 8},
+                                                   {gr::Monomial({{1, 2},
+                                                                  {2, 100}}),   -10}});
         std::cout << "-------------------Polynomial output example----------------------------\n";
         std::cout << pol << "\n";
         std::cout << "------------------------------------------------------------------------\n\n";
         assert(pol == pol1);
         assert(pol != poly);
-        assert(pol - pol == gr::Polynomial<int>());
-        assert(pol + pol == pol * gr::Polynomial<int>({{gr::Monomial(), 2}}));
-        assert(gr::Polynomial<int>() * gr::Polynomial<int>() == gr::Polynomial<int>());
-        assert(pol * poly == gr::Polynomial<int>({{gr::Monomial({{1,   2},
-                                                                 {2,   100},
-                                                                 {10,  100},
-                                                                 {100, 1}}), 80},
-                                                  {gr::Monomial({{10,  200},
-                                                                 {33,  2},
-                                                                 {100, 1}}), 128},
-                                                  {gr::Monomial({{1,  2},
-                                                                 {2,  100},
-                                                                 {10, 100},
-                                                                 {33, 2}}),  -160},
-                                                  {gr::Monomial({{1, 4},
-                                                                 {2, 200}}), -100}}));
-        assert(pol + poly == gr::Polynomial<int>({{gr::Monomial({{10,  100},
-                                                                 {100, 1}}), 8},
-                                                  {gr::Monomial({{10, 100},
-                                                                 {33, 2}}),  16}}));
+        assert(pol - pol == gr::Polynomial<boost::rational<int>>());
+        assert(pol + pol == pol * gr::Polynomial<boost::rational<int>>({{gr::Monomial(), 2}}));
+        assert(gr::Polynomial<boost::rational<int>>() * gr::Polynomial<boost::rational<int>>() ==
+               gr::Polynomial<boost::rational<int>>());
+        assert(pol * poly == gr::Polynomial<boost::rational<int>>({{gr::Monomial({{1,   2},
+                                                                                  {2,   100},
+                                                                                  {10,  100},
+                                                                                  {100, 1}}), 80},
+                                                                   {gr::Monomial({{10,  200},
+                                                                                  {33,  2},
+                                                                                  {100, 1}}), 128},
+                                                                   {gr::Monomial({{1,  2},
+                                                                                  {2,  100},
+                                                                                  {10, 100},
+                                                                                  {33, 2}}),  -160},
+                                                                   {gr::Monomial({{1, 4},
+                                                                                  {2, 200}}), -100}}));
+        assert(pol + poly == gr::Polynomial<boost::rational<int>>({{gr::Monomial({{10,  100},
+                                                                                  {100, 1}}), 8},
+                                                                   {gr::Monomial({{10, 100},
+                                                                                  {33, 2}}),  16}}));
+    }
+    {
+        using Poly = gr::Polynomial<boost::rational<int>, groebner::DegLex::greater>;
+        std::set<Poly, gr::PolynomialOrder> s;
+        s.insert(Poly({{gr::Monomial({{1, 3}}), 1},
+                       {gr::Monomial({{1, 1},
+                                      {2, 1}}), -2}}));
+        s.insert(Poly({{gr::Monomial({{1, 2}, {2, 1}}), 1},
+                       {gr::Monomial({{2, 2}}), -2}, {gr::Monomial({{1, 1}}), 1}}));
+        std::cout << "--------------------Set of polynoms at beginning-------------------\n";
+        for (const auto& p : s) {
+            std::cout << p << "\n";
+        }
+        Poly poly = *s.begin();
+        std::cout << "--------------------Extended to Groebner basis-------------------\n";
+        gr::Algorithm::ExtendToGroebner(s);
+        for (const auto& p : s) {
+            std::cout << p << "\n";
+        }
+        std::cout << "-------------------------Reduced Groebner basis-------------------\n";
+        gr::Algorithm::MakeReduced(s);
+        for (const auto& p : s) {
+            std::cout << p << "\n";
+        }
+        assert(groebner::Algorithm::IsInIdeal(poly, s));
     }
     return 0;
 }

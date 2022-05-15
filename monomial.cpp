@@ -15,6 +15,9 @@ Monomial::Monomial(std::initializer_list<std::pair<const Index_t, Degree_t>> pow
     RemoveZeros();
 }
 
+//Monomial::Monomial(const Powers_t& powers) : powers_(powers) {
+//}
+
 Monomial::Monomial(const Monomial& other) : powers_(other.powers_) {
 }
 

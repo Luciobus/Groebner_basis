@@ -2,13 +2,14 @@
 #define GROEBNER_BASIS_POLYNOMIAL_H
 
 #include <map>
+#include <vector>
 
 #include "monomial.h"
 #include "monomial_order.h"
 
 namespace groebner {
 
-template<typename T, typename Comparator = DegLex::less>
+template<typename T, typename Comparator = DegLex::greater>
 class Polynomial {
 public:
     using Monomials_t = std::map<Monomial, T, Comparator>;
@@ -26,6 +27,23 @@ public:
     }
 
     ~Polynomial() = default;
+
+    Polynomial& operator=(const Polynomial& other) {
+        if (this == &other) {
+            return *this;
+        }
+        Polynomial tmp(other);
+        Swap(tmp);
+        return *this;
+    }
+
+    Polynomial& operator=(Polynomial&& other) noexcept {
+        if (this == &other) {
+            return *this;
+        }
+        Swap(other);
+        return *this;
+    }
 
     Polynomial& operator+=(const Polynomial& other) {
         for (const auto& [monomial, coefficient]: other.monomials_) {
@@ -71,10 +89,6 @@ public:
         return res;
     }
 
-    void Swap(Polynomial& other) {
-        std::swap(monomials_, other.monomials_);
-    }
-
     friend bool operator==(const Polynomial& lhs, const Polynomial& rhs) {
         return lhs.monomials_ == rhs.monomials_;
     }
@@ -83,8 +97,38 @@ public:
         return lhs.monomials_ != rhs.monomials_;
     }
 
+    void Normalize() {
+        if (monomials_.empty()) {
+            return;
+        }
+        T lc = monomials_.begin()->second;
+        for (auto& [monomial, coefficient] : monomials_) {
+            coefficient /= lc;
+        }
+    }
+
+    std::pair<Monomial, T> GetLeadingTerm() const {
+        if (monomials_.empty()) {
+            return {Monomial(), T()};
+        }
+        return *(monomials_.begin());
+    }
+
+    [[nodiscard]] std::vector<Monomial> GetMonomials() const {
+        std::vector<Monomial> monomials;
+        monomials.reserve(monomials_.size());
+        for (auto it = monomials_.cbegin(); it != monomials_.cend(); ++it) {
+            monomials.push_back(it->first);
+        }
+        return monomials;
+    }
+
+    void Swap(Polynomial& other) {
+        std::swap(monomials_, other.monomials_);
+    }
+
     void RemoveZeros() {
-        for (auto it = monomials_.cbegin(); it != monomials_.cend();) {
+        for (auto it = monomials_.begin(); it != monomials_.end();) {
             if (it->second == 0) {
                 it = monomials_.erase(it);
             } else {
