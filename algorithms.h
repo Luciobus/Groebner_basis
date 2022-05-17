@@ -2,6 +2,9 @@
 #define GROEBNER_BASIS_ALGORITHMS_H
 
 #include <set>
+#include <unordered_set>
+#include <deque>
+
 #include "polynomial_order.h"
 
 namespace groebner {
@@ -53,17 +56,51 @@ GetReminder(const Polynomial<T, Comparator>& f, const std::set<Polynomial<T, Com
 
 template<typename T, typename Comparator>
 void ExtendToGroebner(std::set<Polynomial<T, Comparator>, PolynomialOrder>& ideal) {
-    std::set<Polynomial<T, Comparator>, PolynomialOrder> old;
-    while (old != ideal) {
-        old = ideal;
-        for (auto it = old.cbegin(); it != old.cend(); ++it) {
-            for (auto jt = std::next(it); jt != old.cend(); ++jt) {
-                Polynomial<T, Comparator> S = GetSPoly(*it, *jt);
-                if (GetReminder(S, old) != Polynomial<T, Comparator>()) {
-                    ideal.insert(S);
+    using Iter = typename std::set<Polynomial<T, Comparator>, PolynomialOrder>::iterator;
+    // initialize
+    size_t t = ideal.size();
+    std::vector<Iter> iterators;
+    iterators.reserve(t);
+    std::set<std::pair<size_t, size_t>> pairs;
+    for (Iter it = ideal.begin(); it != ideal.end(); ++it) {
+        iterators.push_back(it);
+    }
+    for (size_t i = 0; i != t; ++i) {
+        for (size_t j = i + 1; j != t; ++j) {
+            pairs.emplace(i, j);
+        }
+    }
+    // iterations
+    while (!pairs.empty()) {
+        auto [i_ind, j_ind] = *pairs.begin();
+        Iter it = iterators[i_ind], jt = iterators[j_ind];
+        auto [lm_i, lc_i] = it->GetLeadingTerm();
+        auto [lm_j, lc_j] = jt->GetLeadingTerm();
+        Monomial lcm = GetLCM(lm_i, lm_j);
+        bool found_l = false;
+        for (size_t l_ind = 0; l_ind != t; ++l_ind) {
+            std::pair<size_t, size_t> p1(std::min(l_ind, i_ind), std::max(l_ind, i_ind));
+            std::pair<size_t, size_t> p2(std::min(l_ind, j_ind), std::max(l_ind, j_ind));
+            if (pairs.contains(p1) && pairs.contains(p2)) {
+                auto [lm_l, lc_l] = iterators[l_ind]->GetLeadingTerm();
+                if (lm_l.IsDivisibleBy(lcm)) {
+                    found_l = true;
+                    break;
                 }
             }
         }
+        if (lcm != lm_i * lm_j && !found_l) {
+            Polynomial<T, Comparator> S = GetReminder(GetSPoly(*it, *jt), ideal);
+            if (S != Polynomial<T, Comparator>()) {
+                auto [iter, _] = ideal.insert(S); // always will be inserted
+                iterators.push_back(iter);
+                for (size_t i = 0; i != t; ++i) {
+                    pairs.emplace(i, t);
+                }
+                ++t;
+            }
+        }
+        pairs.erase(pairs.begin());
     }
 }
 
@@ -75,7 +112,7 @@ void MakeReduced(std::set<Polynomial<T, Comparator>, PolynomialOrder>& F) {
         tmp.insert(f);
     }
     F = tmp;
-    for (auto f : tmp) {
+    for (auto f: tmp) {
         F.erase(f);
         if (GetReminder(f, F) != Polynomial<T, Comparator>()) {
             F.insert(f);
@@ -84,11 +121,17 @@ void MakeReduced(std::set<Polynomial<T, Comparator>, PolynomialOrder>& F) {
 }
 
 template<typename T, typename Comparator>
+bool
+IsInGroebnerIdeal(const Polynomial<T, Comparator>& f, const std::set<Polynomial<T, Comparator>, PolynomialOrder>& F) {
+    return GetReminder(f, F) == Polynomial<T, Comparator>();
+}
+
+template<typename T, typename Comparator>
 bool IsInIdeal(const Polynomial<T, Comparator>& f, const std::set<Polynomial<T, Comparator>, PolynomialOrder>& F) {
     std::set<Polynomial<T, Comparator>, PolynomialOrder> G = F;
     ExtendToGroebner(G);
 //    MakeReduced(G);
-    return GetReminder(f, G) == Polynomial<T, Comparator>();
+    return IsInGroebnerIdeal(f, G);
 }
 } // namespace Algorithm
 } // namespace groebner

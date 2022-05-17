@@ -126,7 +126,7 @@ int main() {
         for (const auto& p : s) {
             std::cout << p << "\n";
         }
-        assert(groebner::Algorithm::IsInIdeal(poly, s));
+        assert(groebner::Algorithm::IsInGroebnerIdeal(poly, s));
     }
     return 0;
 }
