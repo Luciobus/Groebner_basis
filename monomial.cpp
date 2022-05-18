@@ -15,6 +15,15 @@ Monomial::Monomial(std::initializer_list<std::pair<const Index_t, Degree_t>> pow
     RemoveZeros();
 }
 
+template<typename Iter>
+Monomial::Monomial(Iter begin, Iter end) {
+    while (begin != end) {
+        powers_[begin->first] = begin->second;
+        ++begin;
+    }
+    RemoveZeros();
+}
+
 //Monomial::Monomial(const Powers_t& powers) : powers_(powers) {
 //}
 

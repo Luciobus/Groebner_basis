@@ -16,7 +16,8 @@ public:
 
     Monomial(std::initializer_list<std::pair<const Index_t, Degree_t>> powers);
 
-//    Monomial(const Powers_t& powers);
+    template<typename Iter>
+    Monomial(Iter begin, Iter end);
 
     Monomial(const Monomial& other);
 

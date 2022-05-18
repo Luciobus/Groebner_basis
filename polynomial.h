@@ -20,6 +20,15 @@ public:
         RemoveZeros();
     }
 
+    template<typename Iter>
+    Polynomial(Iter begin, Iter end) {
+        while (begin != end) {
+            monomials_[begin->first] = begin->second;
+            ++begin;
+        }
+        RemoveZeros();
+    }
+
     Polynomial(const Polynomial& other) : monomials_(other.monomials_) {
     }
 
