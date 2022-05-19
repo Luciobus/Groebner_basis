@@ -55,7 +55,7 @@ bool less::operator()(const Monomial& lhs, const Monomial& rhs) const {
 
 bool less_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
     int cmp_res = cmp(lhs, rhs);
-    return cmp_res <= 0 || (cmp_res == 0 && Lex::less_or_equal()(lhs, rhs));
+    return cmp_res < 0 || (cmp_res == 0 && Lex::less_or_equal()(lhs, rhs));
 }
 
 bool greater::operator()(const Monomial& lhs, const Monomial& rhs) const {
@@ -65,7 +65,7 @@ bool greater::operator()(const Monomial& lhs, const Monomial& rhs) const {
 
 bool greater_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
     int cmp_res = cmp(lhs, rhs);
-    return cmp_res >= 0 || (cmp_res == 0 && Lex::greater_or_equal()(lhs, rhs));
+    return cmp_res > 0 || (cmp_res == 0 && Lex::greater_or_equal()(lhs, rhs));
 }
 } // namespace DegLex
 
@@ -81,24 +81,40 @@ int cmp(const Monomial& lhs, const Monomial& rhs) {
     return (lhs_sum > rhs_sum) - (lhs_sum < rhs_sum);
 }
 
+int cmp2(const Monomial& lhs, const Monomial& rhs) {
+    auto it = lhs.GetPowers().crbegin();
+    auto jt = rhs.GetPowers().crbegin();
+    while (it != lhs.GetPowers().crend() && jt != rhs.GetPowers().crend()) {
+        if (it->first != jt->first) {
+            return (it->first < jt->first) - (it->first > jt->first);
+        }
+        if (it->second != jt->second) {
+            return (it->second > jt->second) - (it->second < jt->second);
+        }
+        ++it;
+        ++jt;
+    }
+    return (jt == lhs.GetPowers().crend()) - (it == rhs.GetPowers().crend());
+}
+
 bool less::operator()(const Monomial& lhs, const Monomial& rhs) const {
     int cmp_res = cmp(lhs, rhs);
-    return cmp_res < 0 || (cmp_res == 0 && Lex::greater()(lhs, rhs));
+    return cmp_res < 0 || (cmp_res == 0 && cmp2(lhs, rhs) > 0);
 }
 
 bool less_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
     int cmp_res = cmp(lhs, rhs);
-    return cmp_res <= 0 || (cmp_res == 0 && Lex::greater_or_equal()(lhs, rhs));
+    return cmp_res < 0 || (cmp_res == 0 && cmp2(lhs, rhs) >= 0);
 }
 
 bool greater::operator()(const Monomial& lhs, const Monomial& rhs) const {
     int cmp_res = cmp(lhs, rhs);
-    return cmp_res > 0 || (cmp_res == 0 && Lex::less()(lhs, rhs));
+    return cmp_res > 0 || (cmp_res == 0 && cmp2(lhs, rhs) < 0);
 }
 
 bool greater_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
     int cmp_res = cmp(lhs, rhs);
-    return cmp_res >= 0 || (cmp_res == 0 && Lex::less_or_equal()(lhs, rhs));
+    return cmp_res > 0 || (cmp_res == 0 && cmp2(lhs, rhs) <= 0);
 }
 } // namespace DegRevLex
 } // namespace groebner

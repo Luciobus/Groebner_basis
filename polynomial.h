@@ -147,6 +147,10 @@ public:
     }
 
     friend std::ostream& operator<<(std::ostream& out, const Polynomial& polynomial) {
+        if (polynomial.monomials_.empty()) {
+            out << T();
+            return out;
+        }
         for (auto it = polynomial.monomials_.begin(); it != polynomial.monomials_.end(); ++it) {
             if (it != polynomial.monomials_.begin() && it->second > T(0)) {
                 out << "+";
