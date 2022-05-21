@@ -127,9 +127,6 @@ std::ostream& operator<<(std::ostream& out, const Monomial& monomial) {
     for (const auto& [index, degree]: monomial.powers_) {
         out << "x_" << index << "^" << degree;
     }
-    if (monomial.powers_.empty()) {
-        out << "1";
-    }
     return out;
 }
 

@@ -16,7 +16,7 @@ int cmp(const Monomial& lhs, const Monomial& rhs) {
         ++it;
         ++jt;
     }
-    return (jt == lhs.GetPowers().cend()) - (it == rhs.GetPowers().cend());
+    return (jt == rhs.GetPowers().cend()) - (it == lhs.GetPowers().cend());
 }
 
 bool less::operator()(const Monomial& lhs, const Monomial& rhs) const {
