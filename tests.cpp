@@ -73,8 +73,8 @@ void test_monomial_order() {
     // DegRevLex order subtest
     assert(!DegRevLex::less()(m1, m2));
     assert(DegRevLex::less_or_equal()(m1, m2));
-    assert(DegRevLex::greater()(m1, m3));
-    assert(DegRevLex::greater_or_equal()(m1, m4));
+    assert(DegRevLex::greater()(m3, m1));
+    assert(DegRevLex::greater_or_equal()(m4, m1));
     std::cout << "Monomial order tests passed\n";
 }
 

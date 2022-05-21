@@ -55,8 +55,25 @@ GetReminder(const Polynomial<T, Comparator>& f, const std::set<Polynomial<T, Com
 }
 
 template<typename T, typename Comparator>
+void MakeReduced(std::set<Polynomial<T, Comparator>, PolynomialOrder>& F) {
+    std::set<Polynomial<T, Comparator>, PolynomialOrder> tmp;
+    for (auto f: F) {
+        f.Normalize();
+        tmp.insert(f);
+    }
+    F = tmp;
+    for (auto f: tmp) {
+        F.erase(f);
+        if (GetReminder(f, F) != Polynomial<T, Comparator>()) {
+            F.insert(f);
+        }
+    }
+}
+
+template<typename T, typename Comparator>
 void ExtendToGroebner(std::set<Polynomial<T, Comparator>, PolynomialOrder>& ideal) {
     using Iter = typename std::set<Polynomial<T, Comparator>, PolynomialOrder>::iterator;
+    MakeReduced(ideal);
     // initialize
     size_t t = ideal.size();
     std::vector<Iter> iterators;
@@ -101,22 +118,6 @@ void ExtendToGroebner(std::set<Polynomial<T, Comparator>, PolynomialOrder>& idea
             }
         }
         pairs.erase(pairs.begin());
-    }
-}
-
-template<typename T, typename Comparator>
-void MakeReduced(std::set<Polynomial<T, Comparator>, PolynomialOrder>& F) {
-    std::set<Polynomial<T, Comparator>, PolynomialOrder> tmp;
-    for (auto f: F) {
-        f.Normalize();
-        tmp.insert(f);
-    }
-    F = tmp;
-    for (auto f: tmp) {
-        F.erase(f);
-        if (GetReminder(f, F) != Polynomial<T, Comparator>()) {
-            F.insert(f);
-        }
     }
 }
 
