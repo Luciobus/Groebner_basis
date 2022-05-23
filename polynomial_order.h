@@ -4,22 +4,20 @@
 #include "polynomial.h"
 
 namespace groebner {
-struct PolynomialOrder {
+class PolynomialOrder {
+public:
     template<class P, class Comparator>
     bool operator()(const Polynomial<P, Comparator>& lhs, const Polynomial<P, Comparator>& rhs) const {
-        auto lhs_m = lhs.GetMonomials();
-        auto rhs_m = rhs.GetMonomials();
-        auto it = lhs_m.cbegin();
-        auto jt = rhs_m.cbegin();
-        while (it != lhs_m.cend() && jt != rhs_m.cend()) {
-            if (*it != *jt) {
-                return Comparator()(*it, *jt);
-            }
-            ++it;
-            ++jt;
-        }
-        return it == lhs_m.cend() && jt != rhs_m.cend();
+        return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), TermsComparator<P, Comparator>());
     }
+
+private:
+    template<class P, class Comparator>
+    struct TermsComparator {
+        bool operator()(const std::pair<Monomial, P>& lhs, const std::pair<Monomial, P>& rhs) const {
+            return Comparator()(lhs.first, rhs.first);
+        }
+    };
 };
 } // namespace groebner
 

@@ -1,62 +1,17 @@
 #include "monomial.h"
 
-#include <iostream>
-#include <map>
-
 namespace groebner {
 
 Monomial::Monomial() = default;
 
-Monomial::Monomial(std::initializer_list<std::pair<const Index_t, Degree_t>> powers) {
-    for (const auto& [index, degree]: powers) {
-        assert(degree >= 0);
-        powers_[index] = degree;
-    }
+Monomial::Monomial(std::initializer_list<std::pair<const Index_t, Degree_t>> powers) : powers_(powers) {
     RemoveZeros();
-}
-
-template<typename Iter>
-Monomial::Monomial(Iter begin, Iter end) {
-    while (begin != end) {
-        powers_[begin->first] = begin->second;
-        ++begin;
-    }
-    RemoveZeros();
-}
-
-//Monomial::Monomial(const Powers_t& powers) : powers_(powers) {
-//}
-
-Monomial::Monomial(const Monomial& other) : powers_(other.powers_) {
-}
-
-Monomial::Monomial(Monomial&& other) noexcept: powers_(std::move(other.powers_)) {
-}
-
-Monomial::~Monomial() = default;
-
-Monomial& Monomial::operator=(const Monomial& other) {
-    if (this == &other) {
-        return *this;
-    }
-    Monomial tmp(other);
-    Swap(tmp);
-    return *this;
-}
-
-Monomial& Monomial::operator=(Monomial&& other) noexcept {
-    if (this == &other) {
-        return *this;
-    }
-    Swap(other);
-    return *this;
 }
 
 Monomial& Monomial::operator*=(const Monomial& other) {
-    for (const auto& [index, degree]: other.powers_) {
+    for (auto [index, degree]: other.powers_) {
         powers_[index] += degree;
     }
-    RemoveZeros();
     return *this;
 }
 
@@ -67,11 +22,8 @@ Monomial operator*(const Monomial& lhs, const Monomial& rhs) {
 }
 
 Monomial& Monomial::operator/=(const Monomial& other) {
-    if (!IsDivisibleBy(other)) {
-        std::cerr << "Cannot be divided\n";
-        return *this;
-    }
-    for (const auto& [index, degree]: other.powers_) {
+    assert(IsDivisibleBy(other) && "Cannot be divided");
+    for (auto [index, degree]: other.powers_) {
         powers_[index] -= degree;
     }
     RemoveZeros();
@@ -89,7 +41,7 @@ bool operator==(const Monomial& lhs, const Monomial& rhs) {
 }
 
 bool operator!=(const Monomial& lhs, const Monomial& rhs) {
-    return lhs.powers_ != rhs.powers_;
+    return !(lhs.powers_ == rhs.powers_);
 }
 
 void Monomial::RemoveZeros() {
@@ -107,8 +59,8 @@ void Monomial::Swap(Monomial& other) {
 }
 
 bool Monomial::IsDivisibleBy(const Monomial& other) {
-    for (const auto& [index, degree]: other.powers_) {
-        if (!powers_.contains(index) || powers_[index] < degree) {
+    for (auto [index, degree]: other.powers_) {
+        if (GetDegree(index) < degree) {
             return false;
         }
     }
@@ -119,13 +71,28 @@ bool Monomial::IsDivisibleBy(const Monomial& other) {
     return powers_;
 }
 
+void Monomial::SetDegree(Index_t index, Degree_t degree) {
+    powers_[index] = degree;
+}
+
 [[nodiscard]] Monomial::Degree_t Monomial::GetDegree(Index_t index) const {
-    return powers_.contains(index) ? powers_.at(index) : Degree_t();
+    return powers_.contains(index) ? powers_.at(index) : Degree_t(0);
+}
+
+Monomial::Degree_t Monomial::GetTotalDegree() const {
+    Degree_t res = 0;
+    for (auto [index, degree]: powers_) {
+        res += degree;
+    }
+    return res;
 }
 
 std::ostream& operator<<(std::ostream& out, const Monomial& monomial) {
-    for (const auto& [index, degree]: monomial.powers_) {
-        out << "x_" << index << "^" << degree;
+    for (auto [index, degree]: monomial.powers_) {
+        out << "x_" << index;
+        if (degree != Monomial::Degree_t(1)) {
+            out << "^" << degree;
+        }
     }
     return out;
 }

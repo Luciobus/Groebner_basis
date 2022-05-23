@@ -76,7 +76,7 @@ std::set<Polynomial<T, Comparator>, PolynomialOrder> get_cyclic(size_t n) {
 template<typename T>
 void test_cyclic(size_t n) {
     using LexSet = std::set<Polynomial<T, Lex::greater>, PolynomialOrder>;
-    using DegLexSet = std::set<Polynomial<T, DegLex::greater>, PolynomialOrder>;
+    using DegLexSet = std::set<Polynomial<T, OrderPair<Deg::greater, Lex::greater>>, PolynomialOrder>;
     std::cout << "Testing cyclic " << n << "...\n";
     LexSet cyclic = get_cyclic<T, Lex::greater>(n);
     for (const auto& f: cyclic) {
@@ -90,8 +90,8 @@ void test_cyclic(size_t n) {
         }
     }
     {
-        DegLexSet cyclic1 = get_cyclic<T, DegLex::greater>(n);
-        test_time(Algorithm::ExtendToGroebner<T, DegLex::greater>, "DegLex order: ")(cyclic1);
+        DegLexSet cyclic1 = get_cyclic<T, OrderPair<Deg::greater, Lex::greater>>(n);
+        test_time(Algorithm::ExtendToGroebner<T, OrderPair<Deg::greater, Lex::greater>>, "DegLex order: ")(cyclic1);
         for (const auto& f: cyclic1) {
             std::cout << f << "\n";
         }

@@ -3,6 +3,7 @@
 
 namespace groebner {
 namespace Lex {
+namespace {
 int cmp(const Monomial& lhs, const Monomial& rhs) {
     auto it = lhs.GetPowers().cbegin();
     auto jt = rhs.GetPowers().cbegin();
@@ -18,6 +19,7 @@ int cmp(const Monomial& lhs, const Monomial& rhs) {
     }
     return (jt == rhs.GetPowers().cend()) - (it == lhs.GetPowers().cend());
 }
+} // anonymous namespace
 
 bool less::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) < 0;
@@ -36,85 +38,65 @@ bool greater_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) cons
 }
 } // namespace Lex
 
-namespace DegLex {
+namespace Deg {
+namespace {
 int cmp(const Monomial& lhs, const Monomial& rhs) {
-    uint64_t lhs_sum = 0, rhs_sum = 0;
-    for (const auto& [_, degree]: lhs.GetPowers()) {
-        lhs_sum += degree;
-    }
-    for (const auto& [_, degree]: rhs.GetPowers()) {
-        rhs_sum += degree;
-    }
+    Monomial::Degree_t lhs_sum = lhs.GetTotalDegree(), rhs_sum = rhs.GetTotalDegree();
     return (lhs_sum > rhs_sum) - (lhs_sum < rhs_sum);
 }
+} // anonymous namespace
 
 bool less::operator()(const Monomial& lhs, const Monomial& rhs) const {
-    int cmp_res = cmp(lhs, rhs);
-    return cmp_res < 0 || (cmp_res == 0 && Lex::less()(lhs, rhs));
+    return cmp(lhs, rhs) < 0;
 }
 
 bool less_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
-    int cmp_res = cmp(lhs, rhs);
-    return cmp_res < 0 || (cmp_res == 0 && Lex::less_or_equal()(lhs, rhs));
+    return cmp(lhs, rhs) < 0;
 }
 
 bool greater::operator()(const Monomial& lhs, const Monomial& rhs) const {
-    int cmp_res = cmp(lhs, rhs);
-    return cmp_res > 0 || (cmp_res == 0 && Lex::greater()(lhs, rhs));
+    return cmp(lhs, rhs) > 0;
 }
 
 bool greater_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
-    int cmp_res = cmp(lhs, rhs);
-    return cmp_res > 0 || (cmp_res == 0 && Lex::greater_or_equal()(lhs, rhs));
+    return cmp(lhs, rhs) >= 0;
 }
-} // namespace DegLex
+} // namespace Deg
 
-namespace DegRevLex {
+namespace RevLex {
+namespace {
 int cmp(const Monomial& lhs, const Monomial& rhs) {
-    uint64_t lhs_sum = 0, rhs_sum = 0;
-    for (const auto& [_, degree]: lhs.GetPowers()) {
-        lhs_sum += degree;
-    }
-    for (const auto& [_, degree]: rhs.GetPowers()) {
-        rhs_sum += degree;
-    }
-    return (lhs_sum > rhs_sum) - (lhs_sum < rhs_sum);
-}
-
-int cmp2(const Monomial& lhs, const Monomial& rhs) {
     auto it = lhs.GetPowers().crbegin();
     auto jt = rhs.GetPowers().crbegin();
     while (it != lhs.GetPowers().crend() && jt != rhs.GetPowers().crend()) {
         if (it->first != jt->first) {
-            return (it->first < jt->first) - (it->first > jt->first);
+            return (it->first > jt->first) - (it->first < jt->first);
         }
         if (it->second != jt->second) {
-            return (it->second > jt->second) - (it->second < jt->second);
+            return (it->second < jt->second) - (it->second > jt->second);
         }
         ++it;
         ++jt;
     }
-    return (jt == lhs.GetPowers().crend()) - (it == rhs.GetPowers().crend());
+    return (it == lhs.GetPowers().crend()) - (jt == rhs.GetPowers().crend());
 }
+} // anonymous namespace
 
 bool less::operator()(const Monomial& lhs, const Monomial& rhs) const {
-    int cmp_res = cmp(lhs, rhs);
-    return cmp_res < 0 || (cmp_res == 0 && cmp2(lhs, rhs) > 0);
+    return cmp(lhs, rhs) < 0;
 }
 
 bool less_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
-    int cmp_res = cmp(lhs, rhs);
-    return cmp_res < 0 || (cmp_res == 0 && cmp2(lhs, rhs) >= 0);
+    return cmp(lhs, rhs) <= 0;
 }
 
 bool greater::operator()(const Monomial& lhs, const Monomial& rhs) const {
-    int cmp_res = cmp(lhs, rhs);
-    return cmp_res > 0 || (cmp_res == 0 && cmp2(lhs, rhs) < 0);
+    return cmp(lhs, rhs) > 0;
 }
 
 bool greater_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
-    int cmp_res = cmp(lhs, rhs);
-    return cmp_res > 0 || (cmp_res == 0 && cmp2(lhs, rhs) <= 0);
+    return cmp(lhs, rhs) >= 0;
 }
-} // namespace DegRevLex
+} // namespace RevLex
+
 } // namespace groebner

@@ -16,19 +16,6 @@ public:
 
     Monomial(std::initializer_list<std::pair<const Index_t, Degree_t>> powers);
 
-    template<typename Iter>
-    Monomial(Iter begin, Iter end);
-
-    Monomial(const Monomial& other);
-
-    Monomial(Monomial&& other) noexcept;
-
-    ~Monomial();
-
-    Monomial& operator=(const Monomial& other);
-
-    Monomial& operator=(Monomial&& other) noexcept;
-
     Monomial& operator*=(const Monomial& other);
 
     friend Monomial operator*(const Monomial& lhs, const Monomial& rhs);
@@ -41,23 +28,24 @@ public:
 
     friend bool operator!=(const Monomial& lhs, const Monomial& rhs);
 
-    void RemoveZeros();
-
     void Swap(Monomial& other);
 
     bool IsDivisibleBy(const Monomial& other);
 
     [[nodiscard]] const Powers_t& GetPowers() const;
 
+    void SetDegree(Index_t index, Degree_t degree);
+
     [[nodiscard]] Degree_t GetDegree(Index_t index) const;
 
-    // In future for printing like a^2z^3aaz^32
-    // void PrintABC();
+    [[nodiscard]] Degree_t GetTotalDegree() const;
 
     friend std::ostream& operator<<(std::ostream& out, const Monomial& monomial);
 
 private:
     Powers_t powers_;
+
+    void RemoveZeros();
 };
 
 }   // namespace groebner

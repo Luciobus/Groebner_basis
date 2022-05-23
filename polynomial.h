@@ -9,49 +9,17 @@
 
 namespace groebner {
 
-template<typename T, typename Comparator = DegLex::greater>
+template<typename T, typename Comparator = OrderPair<Deg::greater, Lex::greater>>
 class Polynomial {
 public:
     using Monomials_t = std::map<Monomial, T, Comparator>;
+    using iterator = typename Monomials_t::iterator;
+    using const_iterator = typename Monomials_t::const_iterator;
 
     Polynomial() = default;
 
     Polynomial(std::initializer_list<std::pair<const Monomial, T>> monomials) : monomials_(monomials) {
         RemoveZeros();
-    }
-
-    template<typename Iter>
-    Polynomial(Iter begin, Iter end) {
-        while (begin != end) {
-            monomials_[begin->first] = begin->second;
-            ++begin;
-        }
-        RemoveZeros();
-    }
-
-    Polynomial(const Polynomial& other) : monomials_(other.monomials_) {
-    }
-
-    Polynomial(Polynomial&& other) : monomials_(std::move(other.monomials_)) {
-    }
-
-    ~Polynomial() = default;
-
-    Polynomial& operator=(const Polynomial& other) {
-        if (this == &other) {
-            return *this;
-        }
-        Polynomial tmp(other);
-        Swap(tmp);
-        return *this;
-    }
-
-    Polynomial& operator=(Polynomial&& other) noexcept {
-        if (this == &other) {
-            return *this;
-        }
-        Swap(other);
-        return *this;
     }
 
     Polynomial& operator+=(const Polynomial& other) {
@@ -103,11 +71,28 @@ public:
     }
 
     friend bool operator!=(const Polynomial& lhs, const Polynomial& rhs) {
-        return lhs.monomials_ != rhs.monomials_;
+        return !(lhs.monomials_ == rhs.monomials_);
+    }
+
+    iterator begin() {
+        return monomials_.begin();
+    }
+    iterator end() {
+        return monomials_.end();
+    }
+    const_iterator begin() const {
+        return monomials_.begin();
+    }
+    const_iterator end() const {
+        return monomials_.end();
+    }
+
+    [[nodiscard]] bool IsEmpty() const {
+        return monomials_.empty();
     }
 
     void Normalize() {
-        if (monomials_.empty()) {
+        if (IsEmpty()) {
             return;
         }
         T lc = monomials_.begin()->second;
@@ -116,10 +101,8 @@ public:
         }
     }
 
-    std::pair<Monomial, T> GetLeadingTerm() const {
-        if (monomials_.empty()) {
-            return {Monomial(), T()};
-        }
+    const std::pair<Monomial, T>& GetLeadingTerm() const {
+        assert(!IsEmpty());
         return *(monomials_.begin());
     }
 

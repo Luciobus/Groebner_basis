@@ -2,24 +2,16 @@
 #define GROEBNER_BASIS_MODULAR_H
 
 namespace groebner {
-// MOD must be signed integer type
-template<auto MOD>
+// mod must be signed integer type
+template<auto mod>
 class Modular {
-    using Value_t = decltype(MOD);
+    using Value_t = decltype(mod);
+    static_assert(std::is_integral_v<Value_t> && std::is_signed_v<Value_t>);
 public:
     Modular() = default;
 
     Modular(const Value_t& value) : value_(value) {
         Normalize();
-    }
-
-    Modular(const Modular& other) : value_(other.value_) {
-    }
-
-    ~Modular() = default;
-
-    Modular& operator=(const Modular& other) {
-        value_ = other.value_;
     }
 
     Modular& operator+=(const Modular& other) {
@@ -79,7 +71,7 @@ public:
 
     static Modular GetInverse(const Modular& other) {
         assert(other != 0);
-        return GetPow(other, MOD - 2);
+        return GetPow(other, mod - 2);
     }
 
     Value_t GetValue() {
@@ -98,9 +90,9 @@ public:
 
 private:
     void Normalize() {
-        value_ %= MOD;
+        value_ %= mod;
         if (value_ < 0) {
-            value_ += MOD;
+            value_ += mod;
         }
     }
 

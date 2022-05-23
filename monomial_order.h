@@ -23,7 +23,7 @@ struct greater_or_equal {
 };
 } // namespace Lex
 
-namespace DegLex {
+namespace Deg {
 
 struct less {
     bool operator()(const Monomial& lhs, const Monomial& rhs) const;
@@ -40,9 +40,9 @@ struct greater {
 struct greater_or_equal {
     bool operator()(const Monomial& lhs, const Monomial& rhs) const;
 };
-} // namespace DegLex
+} // namespace Deg
 
-namespace DegRevLex {
+namespace RevLex {
 struct less {
     bool operator()(const Monomial& lhs, const Monomial& rhs) const;
 };
@@ -58,7 +58,17 @@ struct greater {
 struct greater_or_equal {
     bool operator()(const Monomial& lhs, const Monomial& rhs) const;
 };
-} // namespace DegRevLex
+} // namespace RevLex
+
+template<typename FirstOrder = Deg::greater, typename SecondOrder = Lex::greater>
+struct OrderPair {
+    bool operator()(const Monomial& lhs, const Monomial& rhs) const {
+        if (FirstOrder()(lhs, rhs)) {
+            return true;
+        }
+        return !FirstOrder()(rhs, lhs) && SecondOrder()(lhs, rhs);
+    }
+};
 
 } // namespace groebner
 
