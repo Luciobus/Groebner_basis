@@ -1,3 +1,5 @@
+#pragma once
+
 #include "tests.h"
 #include "speed_test.h"
 

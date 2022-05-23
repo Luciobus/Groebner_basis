@@ -30,7 +30,7 @@ public:
 
     void Swap(Monomial& other);
 
-    bool IsDivisibleBy(const Monomial& other);
+    [[nodiscard]] bool IsDivisibleBy(const Monomial& other) const;
 
     [[nodiscard]] const Powers_t& GetPowers() const;
 

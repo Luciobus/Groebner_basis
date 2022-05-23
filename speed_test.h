@@ -7,10 +7,6 @@
 #include <boost/rational.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
-#include "monomial.h"
-#include "monomial_order.h"
-#include "polynomial.h"
-#include "polynomial_order.h"
 #include "algorithms.h"
 
 namespace groebner {
@@ -49,27 +45,29 @@ TimerWrapper<TFunction> test_time(TFunction function, const std::string& message
 
 template<typename T, typename Comparator>
 Polynomial<T, Comparator> get_sigma(size_t n, size_t ind) {
+    using Polynomial = Polynomial<T, Comparator>;
     if (ind == 0) {
-        return Polynomial<T, Comparator>({{Monomial(), T(1)}});
+        return Polynomial({{Monomial(), T(1)}});
     }
     if (ind == n) {
         Monomial m;
         for (size_t i = 0; i < n; ++i) {
             m *= Monomial({{i, 1}});
         }
-        return Polynomial<T, Comparator>({{m, T(1)}});
+        return Polynomial({{m, T(1)}});
     }
-    Polynomial<T, Comparator> last({{Monomial({{n - 1, 1}}), T(1)}});
+    Polynomial last({{Monomial({{n - 1, 1}}), T(1)}});
     return std::move(get_sigma<T, Comparator>(n - 1, ind) + get_sigma<T, Comparator>(n - 1, ind - 1) * last);
 }
 
 template<typename T, typename Comparator>
 std::set<Polynomial<T, Comparator>, PolynomialOrder> get_cyclic(size_t n) {
-    std::set<Polynomial<T, Comparator>, PolynomialOrder> res;
+    using Polynomial = Polynomial<T, Comparator>;
+    std::set<Polynomial, PolynomialOrder> res;
     for (size_t sigma = 1; sigma < n; ++sigma) {
         res.insert(get_sigma<T, Comparator>(n, sigma));
     }
-    res.insert(get_sigma<T, Comparator>(n, n) - Polynomial<T, Comparator>({{Monomial(), T(1)}}));
+    res.insert(get_sigma<T, Comparator>(n, n) - Polynomial({{Monomial(), T(1)}}));
     return res;
 }
 
@@ -84,14 +82,14 @@ void test_cyclic(size_t n) {
     }
     {
         LexSet cyclic0 = get_cyclic<T, Lex::greater>(n);
-        test_time(Algorithm::ExtendToGroebner<T, Lex::greater>, "Lex order: ")(cyclic0);
+        test_time(Algorithm::ExtendToGroebner<T, Lex::greater>, "Lex order: ")(&cyclic0);
         for (const auto& f: cyclic0) {
             std::cout << f << "\n";
         }
     }
     {
         DegLexSet cyclic1 = get_cyclic<T, OrderPair<Deg::greater, Lex::greater>>(n);
-        test_time(Algorithm::ExtendToGroebner<T, OrderPair<Deg::greater, Lex::greater>>, "DegLex order: ")(cyclic1);
+        test_time(Algorithm::ExtendToGroebner<T, OrderPair<Deg::greater, Lex::greater>>, "DegLex order: ")(&cyclic1);
         for (const auto& f: cyclic1) {
             std::cout << f << "\n";
         }

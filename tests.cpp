@@ -128,8 +128,8 @@ void test_algorithms() {
                    {Monomial({{2, 2}}), -2},
                    {Monomial({{1, 1}}), 1}}));
     Poly poly = *s.begin();
-    Algorithm::ExtendToGroebner(s);
-    Algorithm::MakeReduced(s);
+    Algorithm::ExtendToGroebner(&s);
+    Algorithm::MakeGroebnerReduced(&s);
     assert(groebner::Algorithm::IsInGroebnerIdeal(poly, s));
     std::cout << "Algorithms tests passed\n";
 }

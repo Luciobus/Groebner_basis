@@ -58,7 +58,7 @@ void Monomial::Swap(Monomial& other) {
     std::swap(powers_, other.powers_);
 }
 
-bool Monomial::IsDivisibleBy(const Monomial& other) {
+bool Monomial::IsDivisibleBy(const Monomial& other) const {
     for (auto [index, degree]: other.powers_) {
         if (GetDegree(index) < degree) {
             return false;

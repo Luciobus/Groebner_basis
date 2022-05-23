@@ -101,9 +101,9 @@ public:
         }
     }
 
-    const std::pair<Monomial, T>& GetLeadingTerm() const {
+    const std::pair<const Monomial, T>& GetLeadingTerm() const {
         assert(!IsEmpty());
-        return *(monomials_.begin());
+        return *(monomials_.cbegin());
     }
 
     [[nodiscard]] std::vector<Monomial> GetMonomials() const {
