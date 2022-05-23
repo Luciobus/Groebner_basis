@@ -1,4 +1,3 @@
-#include "monomial.h"
 #include "monomial_order.h"
 
 namespace groebner {
