@@ -41,7 +41,7 @@ bool operator==(const Monomial& lhs, const Monomial& rhs) {
 }
 
 bool operator!=(const Monomial& lhs, const Monomial& rhs) {
-    return !(lhs.powers_ == rhs.powers_);
+    return !(lhs == rhs);
 }
 
 void Monomial::RemoveZeros() {
@@ -72,6 +72,7 @@ bool Monomial::IsDivisibleBy(const Monomial& other) const {
 }
 
 void Monomial::SetDegree(Index_t index, Degree_t degree) {
+    assert(degree > Degree_t(0));
     powers_[index] = degree;
 }
 

@@ -43,9 +43,9 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const Monomial& monomial);
 
 private:
-    Powers_t powers_;
-
     void RemoveZeros();
+
+    Powers_t powers_;
 };
 
 }   // namespace groebner

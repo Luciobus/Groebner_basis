@@ -2,7 +2,7 @@
 #define GROEBNER_BASIS_MODULAR_H
 
 namespace groebner {
-// mod must be signed integer type
+// mod must be prime
 template<auto mod>
 class Modular {
     using Value_t = decltype(mod);

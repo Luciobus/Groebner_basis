@@ -5,70 +5,100 @@
 
 namespace groebner {
 
-namespace Lex {
-struct less {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+struct Lex {
+    static int cmp(const Monomial& lhs, const Monomial& rhs);
+
+    struct less {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
+
+    struct less_or_equal {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
+
+    struct greater {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
+
+    struct greater_or_equal {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
 };
 
-struct less_or_equal {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+struct Deg {
+    static int cmp(const Monomial& lhs, const Monomial& rhs);
+
+    struct less {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
+
+    struct less_or_equal {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
+
+    struct greater {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
+
+    struct greater_or_equal {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
 };
 
-struct greater {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+struct RevLex {
+    static int cmp(const Monomial& lhs, const Monomial& rhs);
+
+    struct less {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
+
+    struct less_or_equal {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
+
+    struct greater {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
+
+    struct greater_or_equal {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const;
+    };
 };
 
-struct greater_or_equal {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
-};
-} // namespace Lex
-
-namespace Deg {
-
-struct less {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
-};
-
-struct less_or_equal {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
-};
-
-struct greater {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
-};
-
-struct greater_or_equal {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
-};
-} // namespace Deg
-
-namespace RevLex {
-struct less {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
-};
-
-struct less_or_equal {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
-};
-
-struct greater {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
-};
-
-struct greater_or_equal {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const;
-};
-} // namespace RevLex
-
-template<typename FirstOrder = Deg::greater, typename SecondOrder = Lex::greater>
+template<typename FirstOrder = Deg, typename SecondOrder = Lex>
 struct OrderPair {
-    bool operator()(const Monomial& lhs, const Monomial& rhs) const {
-        if (FirstOrder()(lhs, rhs)) {
-            return true;
-        }
-        return !FirstOrder()(rhs, lhs) && SecondOrder()(lhs, rhs);
+    static int cmp(const Monomial& lhs, const Monomial& rhs) {
+        int first_cmp = FirstOrder::cmp(lhs, rhs);
+        return first_cmp ? first_cmp : SecondOrder::cmp(lhs, rhs);
     }
+
+    struct less {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const {
+            return cmp(lhs, rhs) < 0;
+        }
+    };
+
+    struct less_or_equal {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const {
+            return cmp(lhs, rhs) <= 0;
+        }
+    };
+
+    struct greater {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const {
+            return cmp(lhs, rhs) > 0;
+        }
+    };
+
+    struct greater_or_equal {
+        bool operator()(const Monomial& lhs, const Monomial& rhs) const {
+            return cmp(lhs, rhs) >= 0;
+        }
+    };
 };
+
+using DegLex = OrderPair<Deg, Lex>;
+using DegRevLex = OrderPair<Deg, RevLex>;
 
 } // namespace groebner
 
