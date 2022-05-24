@@ -82,14 +82,20 @@ void test_cyclic(size_t n) {
     }
     {
         LexSet cyclic0 = get_cyclic<T, Lex::greater>(n);
-        test_time(Algorithm::ExtendToGroebner<T, Lex::greater>, "Lex order: ")(&cyclic0);
+        for (size_t attempt = 1; attempt <= 10; ++attempt) {
+            std::string message = "Lex order: attempt #" + std::to_string(attempt) + ": ";
+            test_time(Algorithm::ExtendToGroebner<T, Lex::greater>, message)(&cyclic0);
+        }
         for (const auto& f: cyclic0) {
             std::cout << f << "\n";
         }
     }
     {
         DegLexSet cyclic1 = get_cyclic<T, OrderPair<Deg::greater, Lex::greater>>(n);
-        test_time(Algorithm::ExtendToGroebner<T, OrderPair<Deg::greater, Lex::greater>>, "DegLex order: ")(&cyclic1);
+        for (size_t attempt = 1; attempt <= 10; ++attempt) {
+            std::string message = "DegLex order: attempt #" + std::to_string(attempt) + ": ";
+            test_time(Algorithm::ExtendToGroebner<T, OrderPair<Deg::greater, Lex::greater>>, message)(&cyclic1);
+        }
         for (const auto& f: cyclic1) {
             std::cout << f << "\n";
         }
