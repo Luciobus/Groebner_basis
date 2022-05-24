@@ -9,7 +9,7 @@
 
 namespace groebner {
 
-template<typename T, typename Comparator = OrderPair<Deg::greater, Lex::greater>>
+template<typename T, typename Comparator = DegLex::greater>
 class Polynomial {
 public:
     using Monomials_t = std::map<Monomial, T, Comparator>;
@@ -71,7 +71,7 @@ public:
     }
 
     friend bool operator!=(const Polynomial& lhs, const Polynomial& rhs) {
-        return !(lhs.monomials_ == rhs.monomials_);
+        return !(lhs == rhs);
     }
 
     iterator begin() {
@@ -87,12 +87,12 @@ public:
         return monomials_.end();
     }
 
-    [[nodiscard]] bool IsEmpty() const {
+    [[nodiscard]] bool IsZero() const {
         return monomials_.empty();
     }
 
     void Normalize() {
-        if (IsEmpty()) {
+        if (IsZero()) {
             return;
         }
         T lc = monomials_.begin()->second;
@@ -102,31 +102,12 @@ public:
     }
 
     const std::pair<const Monomial, T>& GetLeadingTerm() const {
-        assert(!IsEmpty());
+        assert(!IsZero());
         return *(monomials_.cbegin());
-    }
-
-    [[nodiscard]] std::vector<Monomial> GetMonomials() const {
-        std::vector<Monomial> monomials;
-        monomials.reserve(monomials_.size());
-        for (auto it = monomials_.cbegin(); it != monomials_.cend(); ++it) {
-            monomials.push_back(it->first);
-        }
-        return monomials;
     }
 
     void Swap(Polynomial& other) {
         std::swap(monomials_, other.monomials_);
-    }
-
-    void RemoveZeros() {
-        for (auto it = monomials_.begin(); it != monomials_.end();) {
-            if (it->second == 0) {
-                it = monomials_.erase(it);
-            } else {
-                ++it;
-            }
-        }
     }
 
     friend std::ostream& operator<<(std::ostream& out, const Polynomial& polynomial) {
@@ -144,6 +125,16 @@ public:
     }
 
 private:
+    void RemoveZeros() {
+        for (auto it = monomials_.begin(); it != monomials_.end();) {
+            if (it->second == 0) {
+                it = monomials_.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+
     Monomials_t monomials_;
 };
 

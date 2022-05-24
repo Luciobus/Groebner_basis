@@ -66,15 +66,15 @@ void test_monomial_order() {
     assert(Lex::greater()(m3, m1));
     assert(Lex::greater_or_equal()(m4, m2));
     // DegLex order subtest
-    assert(!(OrderPair<Deg::less, Lex::less>()(m1, m2)));
-    assert((OrderPair<Deg::less_or_equal, Lex::less_or_equal>()(m1, m2)));
-    assert((OrderPair<Deg::greater, Lex::greater>()(m4, m2)));
-    assert((OrderPair<Deg::greater_or_equal, Lex::greater_or_equal>()(m3, m2)));
+    assert(!(DegLex::less()(m1, m2)));
+    assert((DegLex::less_or_equal()(m1, m2)));
+    assert((DegLex::greater()(m4, m2)));
+    assert((DegLex::greater_or_equal()(m3, m2)));
     // DegRevLex order subtest
-    assert(!(OrderPair<Deg::less, RevLex::less>()(m1, m2)));
-    assert((OrderPair<Deg::less_or_equal, RevLex::less_or_equal>()(m1, m2)));
-    assert((OrderPair<Deg::greater, RevLex::greater>()(m3, m1)));
-    assert((OrderPair<Deg::greater_or_equal, RevLex::greater_or_equal>()(m4, m1)));
+    assert(!(DegRevLex::less()(m1, m2)));
+    assert((DegRevLex::less_or_equal()(m1, m2)));
+    assert((DegRevLex::greater()(m3, m1)));
+    assert((DegRevLex::greater_or_equal()(m4, m1)));
     std::cout << "Monomial order tests passed\n";
 }
 
@@ -118,7 +118,7 @@ void test_polynomial() {
 }
 
 void test_algorithms() {
-    using Poly = Polynomial<boost::rational<int>, groebner::OrderPair<Deg::greater, Lex::greater>>;
+    using Poly = Polynomial<boost::rational<int>, groebner::DegLex::greater>;
     std::set<Poly, PolynomialOrder> s;
     s.insert(Poly({{Monomial({{1, 3}}), 1},
                    {Monomial({{1, 1},

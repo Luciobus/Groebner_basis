@@ -1,9 +1,7 @@
 #include "monomial_order.h"
 
 namespace groebner {
-namespace Lex {
-namespace {
-int cmp(const Monomial& lhs, const Monomial& rhs) {
+int Lex::cmp(const Monomial& lhs, const Monomial& rhs) {
     auto it = lhs.GetPowers().cbegin();
     auto jt = rhs.GetPowers().cbegin();
     while (it != lhs.GetPowers().cend() && jt != rhs.GetPowers().cend()) {
@@ -18,53 +16,45 @@ int cmp(const Monomial& lhs, const Monomial& rhs) {
     }
     return (jt == rhs.GetPowers().cend()) - (it == lhs.GetPowers().cend());
 }
-} // anonymous namespace
 
-bool less::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool Lex::less::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) < 0;
 }
 
-bool less_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool Lex::less_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) <= 0;
 }
 
-bool greater::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool Lex::greater::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) > 0;
 }
 
-bool greater_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool Lex::greater_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) >= 0;
 }
-} // namespace Lex
 
-namespace Deg {
-namespace {
-int cmp(const Monomial& lhs, const Monomial& rhs) {
-    Monomial::Degree_t lhs_sum = lhs.GetTotalDegree(), rhs_sum = rhs.GetTotalDegree();
-    return (lhs_sum > rhs_sum) - (lhs_sum < rhs_sum);
+int Deg::cmp(const Monomial& lhs, const Monomial& rhs) {
+    Monomial::Degree_t lhs_deg = lhs.GetTotalDegree(), rhs_deg = rhs.GetTotalDegree();
+    return (lhs_deg > rhs_deg) - (lhs_deg < rhs_deg);
 }
-} // anonymous namespace
 
-bool less::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool Deg::less::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) < 0;
 }
 
-bool less_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool Deg::less_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) < 0;
 }
 
-bool greater::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool Deg::greater::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) > 0;
 }
 
-bool greater_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool Deg::greater_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) >= 0;
 }
-} // namespace Deg
 
-namespace RevLex {
-namespace {
-int cmp(const Monomial& lhs, const Monomial& rhs) {
+int RevLex::cmp(const Monomial& lhs, const Monomial& rhs) {
     auto it = lhs.GetPowers().crbegin();
     auto jt = rhs.GetPowers().crbegin();
     while (it != lhs.GetPowers().crend() && jt != rhs.GetPowers().crend()) {
@@ -79,23 +69,21 @@ int cmp(const Monomial& lhs, const Monomial& rhs) {
     }
     return (it == lhs.GetPowers().crend()) - (jt == rhs.GetPowers().crend());
 }
-} // anonymous namespace
 
-bool less::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool RevLex::less::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) < 0;
 }
 
-bool less_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool RevLex::less_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) <= 0;
 }
 
-bool greater::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool RevLex::greater::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) > 0;
 }
 
-bool greater_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
+bool RevLex::greater_or_equal::operator()(const Monomial& lhs, const Monomial& rhs) const {
     return cmp(lhs, rhs) >= 0;
 }
-} // namespace RevLex
 
 } // namespace groebner
