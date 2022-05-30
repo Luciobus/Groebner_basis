@@ -140,7 +140,7 @@ bool IsFirstPairReducibleToZero(const std::set<std::pair<size_t, size_t>>& pairs
     for (size_t l_ind = 0; l_ind != iterators.size(); ++l_ind) {
         std::pair<size_t, size_t> p1(std::min(l_ind, i_ind), std::max(l_ind, i_ind));
         std::pair<size_t, size_t> p2(std::min(l_ind, j_ind), std::max(l_ind, j_ind));
-        if (pairs.contains(p1) && pairs.contains(p2)) {
+        if (!pairs.contains(p1) && !pairs.contains(p2)) {
             auto [lm_l, lc_l] = iterators[l_ind]->GetLeadingTerm();
             if (lcm.IsDivisibleBy(lm_l)) {
                 return true;
@@ -164,6 +164,7 @@ void ExtendToGroebner(std::set<Polynomial<T, Comparator>, PolynomialOrder> *idea
         if (!IsFirstPairReducibleToZero<T, Comparator>(pairs, iterators)) {
             Polynomial<T, Comparator> S = GetReminder(*ideal, GetSPoly(*it, *jt));
             if (!S.IsZero()) {
+                std::cout << S << "\n";
                 UpdatePairs(ideal->size(), &pairs);
                 auto [iter, _] = ideal->insert(S); // always will be inserted
                 iterators.push_back(iter);
