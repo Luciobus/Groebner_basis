@@ -159,7 +159,6 @@ void ExtendToGroebner(std::set<Polynomial<T, Comparator>, PolynomialOrder> *idea
     // iterations
     while (!pairs.empty()) {
         auto [i_ind, j_ind] = *pairs.begin();
-        pairs.erase(pairs.begin());
         Iter it = iterators[i_ind], jt = iterators[j_ind];
 
         if (!IsFirstPairReducibleToZero<T, Comparator>(pairs, iterators)) {
@@ -171,6 +170,7 @@ void ExtendToGroebner(std::set<Polynomial<T, Comparator>, PolynomialOrder> *idea
                 iterators.push_back(iter);
             }
         }
+        pairs.erase({i_ind, j_ind});
     }
 }
 
